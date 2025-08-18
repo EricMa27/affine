@@ -1,0 +1,17 @@
+{
+  "name": "@affine/bug-issues",
+  "version": "0.22.4",
+  "type": "module",
+  "main": "index.js",
+  "private": true,
+  "description": "List the ten most recent bug issues from the GitHub repository",
+  "scripts": {
+    "demo": "node demo.js",
+    "live": "node index.js",
+    "start": "node demo.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^22.0.0"
+  }
+}
