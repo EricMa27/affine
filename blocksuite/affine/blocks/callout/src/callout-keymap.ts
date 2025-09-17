@@ -29,8 +29,9 @@ export const CalloutKeymapExtension = KeymapExtension(std => {
         if (!parent || !matchModels(parent, [CalloutBlockModel])) {
           return false;
         }
-        calloutBlock = std.store.getBlock(parent.id);
-        if (!calloutBlock) return false;
+        const parentBlock = std.store.getBlock(parent.id);
+        if (!parentBlock) return false;
+        calloutBlock = parentBlock;
       }
 
       ctx.get('keyboardState').raw.preventDefault();
