@@ -29,7 +29,7 @@ export class CalloutBlockComponent extends CaptionedBlockComponent<CalloutBlockM
     }
 
     .affine-callout-emoji-container {
-      margin-right: 10px;
+      margin-left: 6px;
       user-select: none;
       font-size: 1.2em;
       width: 24px;
@@ -37,7 +37,7 @@ export class CalloutBlockComponent extends CaptionedBlockComponent<CalloutBlockM
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-top: 2px;
+      margin-top: 10px;
       flex-shrink: 0;
     }
     .affine-callout-emoji:hover {
