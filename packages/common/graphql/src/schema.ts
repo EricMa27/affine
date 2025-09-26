@@ -923,6 +923,7 @@ export enum ErrorNames {
   LICENSE_REVEALED = 'LICENSE_REVEALED',
   LINK_EXPIRED = 'LINK_EXPIRED',
   MAILER_SERVICE_IS_NOT_CONFIGURED = 'MAILER_SERVICE_IS_NOT_CONFIGURED',
+  MANAGED_BY_APP_STORE_OR_PLAY = 'MANAGED_BY_APP_STORE_OR_PLAY',
   MEMBER_NOT_FOUND_IN_SPACE = 'MEMBER_NOT_FOUND_IN_SPACE',
   MEMBER_QUOTA_EXCEEDED = 'MEMBER_QUOTA_EXCEEDED',
   MENTION_USER_DOC_ACCESS_DENIED = 'MENTION_USER_DOC_ACCESS_DENIED',
@@ -2165,6 +2166,7 @@ export interface Query {
   publicUserById: Maybe<PublicUserType>;
   /** query workspace embedding status */
   queryWorkspaceEmbeddingStatus: ContextWorkspaceEmbeddingStatus;
+  revealedAccessTokens: Array<RevealedAccessToken>;
   /** server config */
   serverConfig: ServerConfigType;
   /** Get user by email */
@@ -2583,6 +2585,8 @@ export interface SubscriptionType {
   canceledAt: Maybe<Scalars['DateTime']['output']>;
   createdAt: Scalars['DateTime']['output'];
   end: Maybe<Scalars['DateTime']['output']>;
+  /** If provider is revenuecat, indicates underlying store. Read-only. One of: app_store | play_store */
+  iapStore: Maybe<Scalars['String']['output']>;
   /** @deprecated removed */
   id: Maybe<Scalars['String']['output']>;
   nextBillAt: Maybe<Scalars['DateTime']['output']>;
@@ -2591,6 +2595,8 @@ export interface SubscriptionType {
    * There won't actually be a subscription with plan 'Free'
    */
   plan: SubscriptionPlan;
+  /** Payment provider of this subscription. Read-only. One of: stripe | revenuecat */
+  provider: Maybe<Scalars['String']['output']>;
   recurring: SubscriptionRecurring;
   start: Scalars['DateTime']['output'];
   status: SubscriptionStatus;
@@ -3084,12 +3090,13 @@ export type ListUserAccessTokensQueryVariables = Exact<{
 
 export type ListUserAccessTokensQuery = {
   __typename?: 'Query';
-  accessTokens: Array<{
-    __typename?: 'AccessToken';
+  revealedAccessTokens: Array<{
+    __typename?: 'RevealedAccessToken';
     id: string;
     name: string;
     createdAt: string;
     expiresAt: string | null;
+    token: string;
   }>;
 };
 
