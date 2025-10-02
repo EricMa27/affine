@@ -26,6 +26,7 @@ const config: CapacitorConfig & AppConfig = {
       releaseType: 'AAB',
     },
     adjustMarginsForEdgeToEdge: 'force',
+    webContentsDebuggingEnabled: true,
   },
   server: {
     cleartext: true,
