@@ -9,5 +9,5 @@
     "@affine-test/kit": "workspace:*",
     "@playwright/test": "=1.55.1"
   },
-  "version": "0.25.2"
+  "version": "0.25.7"
 }
