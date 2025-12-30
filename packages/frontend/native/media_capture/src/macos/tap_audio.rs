@@ -23,15 +23,13 @@ use coreaudio::sys::{
   AudioObjectGetPropertyDataSize, AudioObjectID, AudioObjectPropertyAddress,
   AudioObjectRemovePropertyListenerBlock, AudioTimeStamp, OSStatus,
 };
-use napi::{
-  bindgen_prelude::{Float32Array, Result, Status},
-  threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode},
-};
+use napi::bindgen_prelude::Result;
 use napi_derive::napi;
 use objc2::runtime::AnyObject;
 
 use crate::{
   audio_buffer::InputAndOutputAudioBufferList,
+  audio_callback::AudioCallback,
   ca_tap_description::CATapDescription,
   cf_types::CFDictionaryBuilder,
   device::get_device_uid,
@@ -241,7 +239,7 @@ impl AggregateDevice {
   /// Implementation for the AggregateDevice to start processing audio
   pub fn start(
     &mut self,
-    audio_stream_callback: Arc<ThreadsafeFunction<Float32Array, (), Float32Array, Status, true>>,
+    audio_stream_callback: AudioCallback,
     // Add original_audio_stats to ensure consistent target rate
     original_audio_stats: AudioStats,
   ) -> Result<AudioTapStream> {
@@ -300,11 +298,8 @@ impl AggregateDevice {
             return kAudioHardwareBadStreamError as i32;
           };
 
-          // Send the processed audio data to JavaScript
-          audio_stream_callback.call(
-            Ok(mixed_samples.into()),
-            ThreadsafeFunctionCallMode::NonBlocking,
-          );
+          // Send the processed audio data to the configured sink
+          audio_stream_callback.call(mixed_samples);
 
           kAudioHardwareNoError as i32
         },
@@ -576,7 +571,7 @@ pub struct AggregateDeviceManager {
   app_id: Option<AudioObjectID>,
   excluded_processes: Vec<AudioObjectID>,
   active_stream: Option<Arc<std::sync::Mutex<Option<AudioTapStream>>>>,
-  audio_callback: Option<Arc<ThreadsafeFunction<Float32Array, (), Float32Array, Status, true>>>,
+  audio_callback: Option<AudioCallback>,
   original_audio_stats: Option<AudioStats>,
 }
 
@@ -614,10 +609,7 @@ impl AggregateDeviceManager {
   }
 
   /// This sets up the initial stream and listeners.
-  pub fn start_capture(
-    &mut self,
-    audio_stream_callback: Arc<ThreadsafeFunction<Float32Array, (), Float32Array, Status, true>>,
-  ) -> Result<()> {
+  pub fn start_capture(&mut self, audio_stream_callback: AudioCallback) -> Result<()> {
     // Store the callback for potential device switch later
     self.audio_callback = Some(audio_stream_callback.clone());
 
