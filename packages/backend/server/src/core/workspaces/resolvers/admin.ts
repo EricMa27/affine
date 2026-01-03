@@ -31,6 +31,9 @@ enum AdminWorkspaceSort {
   SnapshotSize = 'SnapshotSize',
   BlobCount = 'BlobCount',
   BlobSize = 'BlobSize',
+  SnapshotCount = 'SnapshotCount',
+  MemberCount = 'MemberCount',
+  PublicPageCount = 'PublicPageCount',
 }
 
 registerEnumType(AdminWorkspaceSort, {
@@ -53,6 +56,21 @@ class ListWorkspaceInput {
 
   @Field(() => AdminWorkspaceSort, { nullable: true })
   orderBy?: AdminWorkspaceSort;
+
+  @Field({ nullable: true })
+  public?: boolean;
+
+  @Field({ nullable: true })
+  enableAi?: boolean;
+
+  @Field({ nullable: true })
+  enableSharing?: boolean;
+
+  @Field({ nullable: true })
+  enableUrlPreview?: boolean;
+
+  @Field({ nullable: true })
+  enableDocEmbedding?: boolean;
 }
 
 @ObjectType()
@@ -77,6 +95,18 @@ class AdminWorkspaceMember {
 }
 
 @ObjectType()
+class AdminWorkspaceSharedLink {
+  @Field()
+  docId!: string;
+
+  @Field(() => String, { nullable: true })
+  title?: string | null;
+
+  @Field(() => Date, { nullable: true })
+  publishedAt?: Date | null;
+}
+
+@ObjectType()
 export class AdminWorkspace {
   @Field()
   id!: string;
@@ -95,6 +125,9 @@ export class AdminWorkspace {
 
   @Field()
   enableAi!: boolean;
+
+  @Field()
+  enableSharing!: boolean;
 
   @Field()
   enableUrlPreview!: boolean;
@@ -125,6 +158,9 @@ export class AdminWorkspace {
 
   @Field(() => SafeIntResolver)
   blobSize!: number;
+
+  @Field(() => [AdminWorkspaceSharedLink])
+  sharedLinks!: AdminWorkspaceSharedLink[];
 }
 
 @InputType()
@@ -132,6 +168,7 @@ class AdminUpdateWorkspaceInput extends PartialType(
   PickType(AdminWorkspace, [
     'public',
     'enableAi',
+    'enableSharing',
     'enableUrlPreview',
     'enableDocEmbedding',
     'name',
@@ -165,6 +202,14 @@ export class AdminWorkspaceResolver {
       keyword: filter.keyword,
       features: filter.features,
       order: this.mapSort(filter.orderBy),
+      flags: {
+        public: filter.public ?? undefined,
+        enableAi: filter.enableAi ?? undefined,
+        enableSharing: filter.enableSharing ?? undefined,
+        enableUrlPreview: filter.enableUrlPreview ?? undefined,
+        enableDocEmbedding: filter.enableDocEmbedding ?? undefined,
+      },
+      includeTotal: false,
     });
     return rows;
   }
@@ -174,11 +219,16 @@ export class AdminWorkspaceResolver {
     @Args('filter', { type: () => ListWorkspaceInput })
     filter: ListWorkspaceInput
   ) {
-    const { total } = await this.models.workspace.adminListWorkspaces({
-      ...filter,
-      first: 1,
-      skip: 0,
-      order: this.mapSort(filter.orderBy),
+    const total = await this.models.workspace.adminCountWorkspaces({
+      keyword: filter.keyword,
+      features: filter.features,
+      flags: {
+        public: filter.public ?? undefined,
+        enableAi: filter.enableAi ?? undefined,
+        enableSharing: filter.enableSharing ?? undefined,
+        enableUrlPreview: filter.enableUrlPreview ?? undefined,
+        enableDocEmbedding: filter.enableDocEmbedding ?? undefined,
+      },
     });
     return total;
   }
@@ -193,6 +243,7 @@ export class AdminWorkspaceResolver {
       skip: 0,
       keyword: id,
       order: 'createdAt',
+      includeTotal: false,
     });
     const row = rows.find(r => r.id === id);
     if (!row) {
@@ -247,6 +298,18 @@ export class AdminWorkspaceResolver {
     }));
   }
 
+  @ResolveField(() => [AdminWorkspaceSharedLink], {
+    description: 'Shared links of workspace',
+  })
+  async sharedLinks(@Parent() workspace: AdminWorkspace) {
+    const publicDocs = await this.models.doc.findPublics(workspace.id, 'desc');
+    return publicDocs.map(doc => ({
+      docId: doc.docId,
+      title: doc.title,
+      publishedAt: doc.publishedAt ?? null,
+    }));
+  }
+
   @Mutation(() => AdminWorkspace, {
     description: 'Update workspace flags and features for admin',
     nullable: true,
@@ -281,6 +344,7 @@ export class AdminWorkspaceResolver {
       skip: 0,
       keyword: id,
       order: 'createdAt',
+      includeTotal: false,
     });
     const row = rows.find(r => r.id === id);
     if (!row) {
@@ -297,6 +361,12 @@ export class AdminWorkspaceResolver {
         return 'blobCount';
       case AdminWorkspaceSort.BlobSize:
         return 'blobSize';
+      case AdminWorkspaceSort.SnapshotCount:
+        return 'snapshotCount';
+      case AdminWorkspaceSort.MemberCount:
+        return 'memberCount';
+      case AdminWorkspaceSort.PublicPageCount:
+        return 'publicPageCount';
       case AdminWorkspaceSort.CreatedAt:
       default:
         return 'createdAt';
