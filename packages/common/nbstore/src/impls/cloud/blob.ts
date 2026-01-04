@@ -25,7 +25,8 @@ interface CloudBlobStorageOptions {
   id: string;
 }
 
-const SHOULD_MANUAL_REDIRECT = BUILD_CONFIG.isAndroid || BUILD_CONFIG.isIOS;
+const SHOULD_MANUAL_REDIRECT =
+  BUILD_CONFIG.isAndroid || BUILD_CONFIG.isIOS || BUILD_CONFIG.isElectron;
 const UPLOAD_REQUEST_TIMEOUT = 0;
 
 export class CloudBlobStorage extends BlobStorageBase {
@@ -352,7 +353,8 @@ export class CloudBlobStorage extends BlobStorageBase {
         : undefined;
 
     try {
-      return await globalThis.fetch(input, {
+      const resolvedUrl = new URL(input, this.options.serverBaseUrl).toString();
+      return await globalThis.fetch(resolvedUrl, {
         ...init,
         signal: abortController.signal,
       });

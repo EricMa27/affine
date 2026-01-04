@@ -127,10 +127,125 @@ export const adminServerConfigQuery = {
       url
     }
     availableUserFeatures
+    availableWorkspaceFeatures
   }
 }
 ${passwordLimitsFragment}
 ${credentialsRequirementsFragment}`,
+};
+
+export const adminUpdateWorkspaceMutation = {
+  id: 'adminUpdateWorkspaceMutation' as const,
+  op: 'adminUpdateWorkspace',
+  query: `mutation adminUpdateWorkspace($input: AdminUpdateWorkspaceInput!) {
+  adminUpdateWorkspace(input: $input) {
+    id
+    public
+    createdAt
+    name
+    avatarKey
+    enableAi
+    enableSharing
+    enableUrlPreview
+    enableDocEmbedding
+    features
+    owner {
+      id
+      name
+      email
+      avatarUrl
+    }
+    memberCount
+    publicPageCount
+    snapshotCount
+    snapshotSize
+    blobCount
+    blobSize
+  }
+}`,
+};
+
+export const adminWorkspaceQuery = {
+  id: 'adminWorkspaceQuery' as const,
+  op: 'adminWorkspace',
+  query: `query adminWorkspace($id: String!, $memberSkip: Int, $memberTake: Int, $memberQuery: String) {
+  adminWorkspace(id: $id) {
+    id
+    public
+    createdAt
+    name
+    avatarKey
+    enableAi
+    enableSharing
+    enableUrlPreview
+    enableDocEmbedding
+    features
+    owner {
+      id
+      name
+      email
+      avatarUrl
+    }
+    memberCount
+    publicPageCount
+    snapshotCount
+    snapshotSize
+    blobCount
+    blobSize
+    sharedLinks {
+      docId
+      title
+      publishedAt
+    }
+    members(skip: $memberSkip, take: $memberTake, query: $memberQuery) {
+      id
+      name
+      email
+      avatarUrl
+      role
+      status
+    }
+  }
+}`,
+};
+
+export const adminWorkspacesQuery = {
+  id: 'adminWorkspacesQuery' as const,
+  op: 'adminWorkspaces',
+  query: `query adminWorkspaces($filter: ListWorkspaceInput!) {
+  adminWorkspaces(filter: $filter) {
+    id
+    public
+    createdAt
+    name
+    avatarKey
+    enableAi
+    enableSharing
+    enableUrlPreview
+    enableDocEmbedding
+    features
+    owner {
+      id
+      name
+      email
+      avatarUrl
+    }
+    memberCount
+    publicPageCount
+    snapshotCount
+    snapshotSize
+    blobCount
+    blobSize
+  }
+}`,
+};
+
+export const adminWorkspacesCountQuery = {
+  id: 'adminWorkspacesCountQuery' as const,
+  op: 'adminWorkspacesCount',
+  query: `query adminWorkspacesCount($filter: ListWorkspaceInput!) {
+  adminWorkspacesCount(filter: $filter)
+}`,
 };
 
 export const createChangePasswordUrlMutation = {
@@ -287,7 +402,7 @@ export const listUsersQuery = {
     emailVerified
     avatarUrl
   }
-  usersCount
+  usersCount(filter: $filter)
 }`,
 };
 
@@ -2433,6 +2548,7 @@ export const getWorkspaceConfigQuery = {
   query: `query getWorkspaceConfig($id: String!) {
   workspace(id: $id) {
     enableAi
+    enableSharing
     enableUrlPreview
     enableDocEmbedding
     inviteLink {
@@ -2458,6 +2574,16 @@ export const setEnableDocEmbeddingMutation = {
   op: 'setEnableDocEmbedding',
   query: `mutation setEnableDocEmbedding($id: ID!, $enableDocEmbedding: Boolean!) {
   updateWorkspace(input: {id: $id, enableDocEmbedding: $enableDocEmbedding}) {
+    id
+  }
+}`,
+};
+
+export const setEnableSharingMutation = {
+  id: 'setEnableSharingMutation' as const,
+  op: 'setEnableSharing',
+  query: `mutation setEnableSharing($id: ID!, $enableSharing: Boolean!) {
+  updateWorkspace(input: {id: $id, enableSharing: $enableSharing}) {
     id
   }
 }`,

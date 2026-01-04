@@ -68,7 +68,7 @@
     "@vitest/coverage-istanbul": "^3.2.4",
     "@vitest/ui": "^3.2.4",
     "cross-env": "^10.1.0",
-    "electron": "^35.0.0",
+    "electron": "^39.0.0",
     "eslint": "^9.16.0",
     "eslint-config-prettier": "^10.0.0",
     "eslint-import-resolver-typescript": "^4.0.0",
@@ -92,7 +92,7 @@
     "vite": "^7.2.7",
     "vitest": "^3.2.4"
   },
-  "packageManager": "yarn@4.9.1",
+  "packageManager": "yarn@4.12.0",
   "resolutions": {
     "array-buffer-byte-length": "npm:@nolyfill/array-buffer-byte-length@^1",
     "array-includes": "npm:@nolyfill/array-includes@^1",
