@@ -31,6 +31,26 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
 
     return [
       {
+        name: 'Eric',
+        icon: NowIcon(),
+        tooltip: slashMenuToolTips['Eric'],
+        description: '[Eric]   ' + formatTimeShort(now),
+        group: '6_Date@0',
+        action: ({ std, model }) => {
+          insertContent(std, model, '[Eric]   ' + formatTimeShort(now));
+        },
+      },
+      {
+        name: 'Bonnie',
+        icon: NowIcon(),
+        tooltip: slashMenuToolTips['Bonnie'],
+        description: '[Bonnie] ' + formatTimeShort(now),
+        group: '6_Date@0',
+        action: ({ std, model }) => {
+          insertContent(std, model, '[Bonnie] ' + formatTimeShort(now));
+        },
+      },
+      {
         name: 'Today',
         icon: TodayIcon(),
         tooltip: slashMenuToolTips['Today'],
