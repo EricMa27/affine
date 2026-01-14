@@ -19,7 +19,7 @@ import { type DeltaInsert, Slice, Text } from '@blocksuite/store';
 
 import { slashMenuToolTips } from './tooltips';
 import type { SlashMenuConfig } from './types';
-import { formatDate, formatTime } from './utils';
+import { formatDate, formatTime, formatTimeShort } from './utils';
 
 export const defaultSlashMenuConfig: SlashMenuConfig = {
   items: () => {
@@ -30,6 +30,26 @@ export const defaultSlashMenuConfig: SlashMenuConfig = {
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     return [
+      {
+        name: 'Eric',
+        icon: NowIcon(),
+        tooltip: slashMenuToolTips['Eric'],
+        description: '[Eric]   ' + formatTimeShort(now),
+        group: '6_Date@0',
+        action: ({ std, model }) => {
+          insertContent(std, model, '[Eric]   ' + formatTimeShort(now));
+        },
+      },
+      {
+        name: 'Bonnie',
+        icon: NowIcon(),
+        tooltip: slashMenuToolTips['Bonnie'],
+        description: '[Bonnie] ' + formatTimeShort(now),
+        group: '6_Date@0',
+        action: ({ std, model }) => {
+          insertContent(std, model, '[Bonnie] ' + formatTimeShort(now));
+        },
+      },
       {
         name: 'Today',
         icon: TodayIcon(),
